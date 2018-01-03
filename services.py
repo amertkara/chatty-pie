@@ -42,6 +42,23 @@ def get_existing_ownership_proofs(urlsafe_account_id, domain_name):
         .fetch()
 
 
+def add_domain(urlsafe_account_id, domain_name):
+    existing_ownership_proofs = get_existing_ownership_proofs(urlsafe_account_id, domain_name)
+    if existing_ownership_proofs:
+        raise AssertionError("Domain " + domain_name + " already exists for the account with id " + urlsafe_account_id)
+    else:
+        new_domain = DomainOwnershipProof(account_id=urlsafe_account_id, domain_name=domain_name)
+        new_domain.put()
+
+
+def delete_domain(urlsafe_account_id, domain_name):
+    existing_ownership_proofs = get_existing_ownership_proofs(urlsafe_account_id, domain_name)
+    if not existing_ownership_proofs:
+        raise LookupError("Domain " + domain_name + " does not exist for the account with id " + urlsafe_account_id)
+    else:
+        existing_ownership_proofs[0].key.delete()
+
+
 def get_all_accounts():
     return Account.query().fetch()
 

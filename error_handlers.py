@@ -12,10 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 def handle_400(request, response, exception):
     response.headers["Content-Type"] = "application/json; charset=utf-8"
     response.write(exception)
     response.set_status(400)
+    return
+
+
+def handle_404(request, response, exception):
+    response.headers["Content-Type"] = "application/json; charset=utf-8"
+    response.write(exception)
+    response.set_status(404)
+    return
+
+
+def handle_409(request, response, exception):
+    response.headers["Content-Type"] = "application/json; charset=utf-8"
+    response.write(exception)
+    response.set_status(409)
     return
 
 

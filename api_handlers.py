@@ -20,7 +20,7 @@ from json_helpers import json_account, get_json_value, json_accounts, json_chatr
 from services import create_account, get_all_accounts, create_chatroom, delete_chatroom, get_all_chatrooms, \
     allow_user_access_in_chatroom, revoke_user_access_in_chatroom,\
     get_chatrooms_in, get_all_users_allowed_in, get_posts_in, create_post, \
-    update_chatroom, get_domain_ownership_proof, get_existing_ownership_proofs, get_chatroom
+    update_chatroom, get_domain_ownership_proof, get_existing_ownership_proofs, get_chatroom, add_domain, delete_domain
 
 
 class JsonApiHandler(webapp2.RequestHandler):
@@ -35,6 +35,10 @@ class JsonApiHandler(webapp2.RequestHandler):
             self.abort(400, "{ \"error\": \"invalid entity key\" }")
         elif isinstance(exception, ValueError):
             self.abort(400, "{ \"error\": \"" + exception.message + "\" }")
+        elif isinstance(exception, LookupError):
+            self.abort(404, "{ \"error\": \"" + exception.message + "\" }")
+        elif isinstance(exception, AssertionError):
+            self.abort(409, "{ \"error\": \"" + exception.message + "\" }")
         else:
             self.abort(500, exception)
 
@@ -60,6 +64,16 @@ class AccountDomainOwnershipApi(JsonApiHandler):
     def get(self, account_id, domain_name):
         domain_ownership_proof = get_domain_ownership_proof(account_id, domain_name)
         write_json_response(self.response, 200, json_domain_ownership_proof(domain_ownership_proof))
+
+
+class AccountDomainApi(JsonApiHandler):
+    def post(self, account_id, domain_name):
+        add_domain(account_id, domain_name)
+        write_json_response(self.response, 200, "")
+
+    def delete(self, account_id, domain_name):
+        delete_domain(account_id, domain_name)
+        write_json_response(self.response, 200, "")
 
 
 class OwnershipVerificationApi(JsonApiHandler):
